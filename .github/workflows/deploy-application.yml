@@ -1,0 +1,38 @@
+name: Azure Container Apps Build and Deploy
+
+
+on:
+  # push:
+  #   branches:
+  #     - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Bootstrap environment
+        type: environment
+        required: true
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+      - name: Build and deploy Container App
+        uses: azure/container-apps-deploy-action@v1
+        with:
+          appSourcePath: ${{ github.workspace }}/src
+          acrName: crthunebyinfrastructure
+          containerAppName: ca-albumui
+          resourceGroup: rg-container-apps
+          imageToBuild: crthunebyinfrastructure.azurecr.io/albumui:latest
