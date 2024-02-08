@@ -14,6 +14,16 @@ resource "azurerm_user_assigned_identity" "albumui" {
   resource_group_name = data.azurerm_resource_group.applications.name
 }
 
+resource "azurerm_role_assignment" "container_registry_acrpull_user_assigned" {
+  role_definition_name = "AcrPull"
+  scope                = data.azurerm_container_registry.acr.id
+  principal_id         = azurerm_user_assigned_identity.albumui.principal_id
+
+  depends_on = [
+    azurerm_user_assigned_identity.albumui
+  ]
+}
+
 resource "azurerm_container_app" "application" {
   name                         = azurecaf_name.app_name.result
   container_app_environment_id = data.azurerm_container_app_environment.applications.id
@@ -23,8 +33,8 @@ resource "azurerm_container_app" "application" {
 
   template {
     container {
-      name   = "examplecontainerapp"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      name   = "albumui"
+      image  = "crthunebyinfrastructure.azurecr.io/albumui:latest"
       cpu    = 0.25
       memory = "0.5Gi"
       liveness_probe {
@@ -65,17 +75,10 @@ resource "azurerm_container_app" "application" {
   }
 
   depends_on = [
-    azurecaf_name.app_name, azurerm_user_assigned_identity.albumui
+    azurecaf_name.app_name,
+    azurerm_user_assigned_identity.albumui,
+    azurerm_role_assignment.container_registry_acrpull_user_assigned
   ]
 
 }
 
-resource "azurerm_role_assignment" "container_registry_acrpull_user_assigned" {
-  role_definition_name = "AcrPull"
-  scope                = data.azurerm_container_registry.acr.id
-  principal_id         = azurerm_user_assigned_identity.albumui.principal_id
-
-  depends_on = [
-    azurerm_container_app.application
-  ]
-}
