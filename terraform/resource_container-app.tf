@@ -23,8 +23,8 @@ resource "azurerm_container_app" "application" {
 
   template {
     container {
-      name   = "examplecontainerapp"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+      name   = "albumui"
+      image  = "crthunebyinfrastructure.azurecr.io/albumui:latest"
       cpu    = 0.25
       memory = "0.5Gi"
       liveness_probe {
