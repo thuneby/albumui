@@ -75,7 +75,7 @@ resource "azurerm_container_app" "application" {
   }
 
   depends_on = [
-    azurecaf_name.app_name, 
+    azurecaf_name.app_name,
     azurerm_user_assigned_identity.albumui,
     azurerm_role_assignment.container_registry_acrpull_user_assigned
   ]
