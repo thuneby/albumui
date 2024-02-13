@@ -1,16 +1,18 @@
 locals {
-  fqdn = "https://${data.azurerm_container_app.api.ingress[0].fqdn}"
+  fqdn     = "https://${data.azurerm_container_app.api.ingress[0].fqdn}"
+  app_name = "albumui"
+  app_port = 3000
 }
 
 resource "azurecaf_name" "app_name" {
-  name          = "albumui"
+  name          = local.app_name
   resource_type = "azurerm_container_app"
   clean_input   = true
 }
 
 resource "azurerm_user_assigned_identity" "albumui" {
   location            = data.azurerm_resource_group.applications.location
-  name                = "id-albumui"
+  name                = "id-${local.app_name}"
   resource_group_name = data.azurerm_resource_group.applications.name
 }
 
@@ -33,12 +35,12 @@ resource "azurerm_container_app" "application" {
 
   template {
     container {
-      name   = "albumui"
+      name   = local.app_name
       image  = "crthunebyinfrastructure.azurecr.io/albumui:latest"
       cpu    = 0.25
       memory = "0.5Gi"
       liveness_probe {
-        port      = 3000
+        port      = local.app_port
         transport = "HTTP"
       }
       env {
@@ -50,7 +52,7 @@ resource "azurerm_container_app" "application" {
 
   ingress {
     external_enabled = true
-    target_port      = 3000
+    target_port      = local.app_port
     transport        = "auto"
     traffic_weight {
       percentage      = 100
@@ -66,6 +68,12 @@ resource "azurerm_container_app" "application" {
   registry {
     server   = data.azurerm_container_registry.acr.login_server
     identity = azurerm_user_assigned_identity.albumui.id
+  }
+
+  dapr {
+    app_id       = local.app_name
+    app_port     = local.app_port
+    app_protocol = "http"
   }
 
   lifecycle {
