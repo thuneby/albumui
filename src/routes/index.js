@@ -3,12 +3,23 @@ var router = express.Router();
 require("dotenv").config();
 const axios = require("axios");
 const background = process.env.BACKGROUND_COLOR;
+const DAPR_HOST = process.env.DAPR_HOST || "http://localhost";
+const DAPR_HTTP_PORT = process.env.DAPR_HTTP_PORT || "3500";
 
 const api = axios.create({
-  baseURL: process.env.API_BASE_URL,
+  baseURL: `${DAPR_HOST}:${DAPR_HTTP_PORT}`,
   params: {},
   timeout: process.env.TIMEOUT || 15000,
+  headers: {
+    "dapr-app-id": "albumapi",
+  }
 });
+
+// const api = axios.create({
+//   baseURL: process.env.API_BASE_URL,
+//   params: {},
+//   timeout: process.env.TIMEOUT || 15000,
+// });
 
 /* GET home page. */
 router.get("/", async function (req, res, next) {
