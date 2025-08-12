@@ -32,7 +32,7 @@ jobs:
         working-directory: ./terraform
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -61,7 +61,7 @@ jobs:
     steps:
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
@@ -106,7 +106,7 @@ jobs:
 
     steps:
     # Checkout the repository to the GitHub Actions runner
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Get prepared plan
       uses: actions/download-artifact@v4
